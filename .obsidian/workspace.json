@@ -1,0 +1,210 @@
+{
+  "main": {
+    "id": "62134d2c4b4851ac",
+    "type": "split",
+    "children": [
+      {
+        "id": "5552c0fe87721b9c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d47cc02d799a99e4",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "qpl-survey/qpl-survey.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "qpl-survey"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "22433305cfe1b87a",
+    "type": "split",
+    "children": [
+      {
+        "id": "436875ff832b61b1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "cfb9e7b721b22db5",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "65f72c63fd69866b",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "circuits",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "59461fc5ff05a828",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "right": {
+    "id": "918db7b65cbb4d85",
+    "type": "split",
+    "children": [
+      {
+        "id": "abb54fde1c71b9f1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "75fc7bcc687ec3e2",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Exercises.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Exercises"
+            }
+          },
+          {
+            "id": "62e0ba8853ad5327",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Exercises.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Exercises"
+            }
+          },
+          {
+            "id": "8396ef6ea5e410f2",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "6b7b9f88a6dec0c7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Exercises.md"
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Exercises"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "table-editor-obsidian:Advanced Tables Toolbar": false
+    }
+  },
+  "active": "d47cc02d799a99e4",
+  "lastOpenFiles": [
+    "teleport.png",
+    "QPL Survey.md",
+    "QPL Survey.pdf",
+    "papers/misc/Rethinking Java Performance Analysis.md",
+    "papers/QC/ScaffCC.md",
+    "phase kickback.md",
+    "teleport (1).png",
+    "papers/QC/Q Sharp.md",
+    "papers/misc/Contiki - a Lightweight and Flexible Operating System for Tiny Networked Sensors.md",
+    "papers/QC/Q Shartp.md",
+    "papers/QC/OQASM.md",
+    "modified.md",
+    "papers/QC/! Silq.md",
+    "original.md",
+    "diff.patch",
+    "eail.md",
+    "papers/misc/This is not an article - just some thoughts on how to write one.md",
+    "Toolbox.md",
+    "meeting agenda.md",
+    "reading list.md",
+    "Resources.md",
+    "notes/Measurement principles.md",
+    "notes/Measurement.md",
+    "notes/Symbol Tables.md",
+    "Glossary.md",
+    "thoughts/Categories.md",
+    "dependency tracking.md",
+    "An in.md",
+    "notes/Winskel Exercises.md",
+    "notes/QC Course notes",
+    "thoughts",
+    "QPL Survey.html",
+    "notes",
+    "denotational-semantics",
+    "papers/misc",
+    "papers/QC",
+    "papers",
+    "Pasted image 20240812115444.png",
+    "Pasted image 20240812112132.png"
+  ]
+}
