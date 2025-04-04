@@ -1,5 +1,5 @@
 watch: qpl-survey/qpl-survey.md
-	marp qpl-survey/qpl-survey.md -o ./out/qpl-survey.html -w
+	marp qpl-survey/qpl-survey.md --allow-local-files -o ./out/qpl-survey.html -w
 
 html: qpl-survey/qpl-survey.md
 	marp qpl-survey/qpl-survey.md -o ./out/qpl-survey.html
@@ -7,6 +7,8 @@ html: qpl-survey/qpl-survey.md
 pdf: qpl-survey/qpl-survey.md
 	marp qpl-survey/qpl-survey.md  --pdf --allow-local-files -o ./out/qpl-survey.pdf
 
-.PHONY: clean
+.PHONY: clean all
 clean:
 	rm -r out 
+
+all: html pdf

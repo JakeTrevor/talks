@@ -283,6 +283,7 @@ def bell_pair() {
 def teleport(q) {
 	a, b <- bell_pair()
 	CX q a
+	H qx
 	q', a' = M q a
 	if (a') X b
 	if (q') Z b
@@ -294,7 +295,7 @@ def teleport(q) {
 
 and as a circuit diagram:
 
-![](qpl-survey/teleport.png)
+![](../qpl-survey/teleport.png)
 
 ---
 
@@ -381,7 +382,7 @@ Compiler optimisation aims to find automatic ways to translate understandable co
 ---
 
 ### QPL
--- OR --
+##### -- OR --
 ### Why should we care about the intersection of QC and PL?
 
 ---
@@ -552,7 +553,7 @@ We can broadly break down high-level quantum programming languages into three ca
 
 ---
 
-### Quantum teleportation in Quiskit:
+### Quantum teleportation in Qiskit:
 
 ```python
 from qiskit import QuantumCircuit
@@ -582,7 +583,7 @@ Interops with CLR - so C\#, F\#, etc.
 
 One of a small number of truly free-standing QPLs.
 
-Q\# is interesting because it is not a circuit description language. It takes a more liberal view of QC:
+Q\# is interesting because it is not a circuit description language. It takes a different view of QC:
 
 > A quantum computer is just a hardware accelerator (like a GPU).
 
@@ -609,6 +610,8 @@ Q\# is not going to be the language of quantum computing.
 
 ---
 
+
+/// TODO check this is actually real code that works maybe?
 ```qsharp
 namespace Teleportation {
     open Microsoft.Quantum.Intrinsic;
@@ -649,7 +652,7 @@ Embedded in Haskell - install with cabal.
 **Despite its functional style, it's still a circuit description language.**
 
 Quipper does not compile to any quantum assembly.
-Its not really intended to run on a real quantum computer.
+It's not really intended to run on a real quantum computer.
 
 It's designed for semantics research.
 
@@ -667,6 +670,8 @@ Core fragments of quipper have been extracted and studied:
 ---
 
 ### Quipper
+
+%% TODO DATES! %%
 
 The overall goal: unify fragments and get a language with well defined semantics for everything.
 
@@ -688,9 +693,9 @@ teleport q = do
 	x, y <- bell_pair
 	x <- qnot x ‘controlled‘ q
 	q <- hadamard q
-	(a, b) <- measure (q,x)
-	y <- gate_Z y ‘controlled‘ a
-	y <- gate_X y ‘controlled‘ b
+	(q', x') <- measure (q,x)
+	y <- gate_Z y ‘controlled‘ q'
+	y <- gate_X y ‘controlled‘ x'
 	cdiscard (x,y)
 	return y
 ```
@@ -699,12 +704,49 @@ teleport q = do
 
 ### Silq
 
-Silq is another functional research language.
+A functional language with an operational semantics
 
-Other things in this lineage:
+Silq investigated automatic uncomputation
+ - automatically disposing of temporary values generated in a computation.
+ - Silq can only do this for 'qfree' functions
+	 -> functions that can be described on a classical computer.
+- So Like an automatic oracle generator, but more powerful
+	- much more concise
+	- less prone to error
+- This is all captured automatically, by the type system
 
-- unqomp applies the same algorithm on an IR level.
-- qurtz (just this year out of Edinburgh)
+--- 
+### Silq
+
+Other nice features:
+ - linear type system
+ - classical & quantum control-flow are treated the same syntactically;
+	 - there is no CNOT gate, as we will see.
+ - dynamic lifting
+
+---
+
+### Quantum Teleportation in Silq
+```silq
+def bell_pair(){
+    x := 0 : B;
+    y := 0 : B;
+    x := H(x);
+    if x { y := X(y); }
+    return (x, y);
+}
+
+
+def teleport(q: B) {
+    (x, y) := bell_pair();
+    if q { x := X(x); }
+
+    if measure(q) { y := Z(y); }
+    if measure(x) { y := X(y); }
+
+    return y
+}
+```
 
 ---
 
@@ -729,26 +771,69 @@ For almost all of these topics, we need a well defined quantum assembly
 ## Quantum IRs/Assemblies
 
 - There are a number of competing assembly languages for quantum computing
-- None of these are native to an actual QC though, so they're all really just IRs.
+- None of these are native to an actual QC though, so they're all really just IRs. 
 
-What are the characteristics of an assembly language?
-explicit register allocation
-explicit memory management
-machine languages -> clear cost model
-though this is not true of assemblies
+---
+
+### What do we want from a QIR/QASM?
+#### A good QASM should:
+- allow expression of most useful quantum programs
+	- include dynamic lifting &
+	- classical control flow structures
+- support analyses and symbolic execution
+	- Or at least have a way to generate/earmark code friendly to such techniques
+- support modularisation
+	- support for functions and general code reuse
+	- Ideally with dynamic allocation
+
+As far as I am aware, No language supports all of these features
+- in fact, most don't even crack 50%. 
 
 ---
 
 ### ScaffCC/Scaff
 
-One of the earliest quantum assemblies "QASM"
-Inspired by Nielson and Chuang.
+- An early attempt at a quantum assembly ("QASM")
+	- Inspired by Nielson and Chuang
+- Really interesting paper:
+	- explores compilation techniques for quantum computing
+- Some of the ideas explored were not great
+	- scaffCC's QASM uses a "flat" format, which avoids classical control flow
+	- The scaffCC paper serves as a great argument not to do it that way
 
-The main aim: explore compiler techniques for quantum computing
+---
+### ScaffCC: Flat codes
 
-Scaff's QASM has no classical control flow - the code must be flat.
+- A Flat format assembly is a straight-line code with no branching.
+	- the entire program is a single basic block
+- all classical control flow is unrolled/evaluated, 
+- To get this to work, you specify the input size and all classical parameters of the problem you are trying to solve at compile time
 
-This is in fact largely intractable - Scaff makes a compromise using QASM-HL.
+---
+
+Flat codes are intractable for conventional compiler approaches. To get around this they introduced:
+- vectorisation
+	- you can loop (or really, apply a gate) over slices of qubit vectors
+- functions
+	- you can define reusable "modules" which mutate their input data (no return statement)
+
+---
+### ScaffCC: Other features
+
+- ScaffCC includes a quantum oracle generator (called "classical-to-quantum-gate" or CTQG in the paper).
+- Also explored instrumentation-based approach to compilation
+- Rather than passes, scaff evaluates classical component of the program 
+	- quantum gate calls are emitted as output
+- automatically determines what classical elements need to be evaluated vs those that need to be integrated by CTQG.
+
+---
+
+In conclusion:
+
+A super interesting paper because it demonstrates a lot of weird stuff
+
+But ScaffCC's QASM is not the QASM of the future.
+
 
 ---
 
@@ -797,7 +882,6 @@ if (result[1]) {
 ```
 
 ---
-
 ### QIR
 
 - developed alongside Q#
@@ -807,21 +891,35 @@ if (result[1]) {
 ### QSSA
 
 - A single static assignment form for quantum computing
+- build with LLBM
 - Requires an extra check to enforce qubit linearity
 - Demonstrated that classical optimisations (sans copying) can work on quantum code
   -> actually, the performance was almost as good in many cases as the hand-rolled quantum optimiser.
 
 ---
+### Takeaways:
 
-Low-level take aways:
+- QPL is a hot research topic with lots of interesting problems
+	- even non-quantum elements ripe for exploration
+- QPL suffers from a lack of cohesion
+	- work often does not connect together well
+- Even basic features are sporadically distributed 
+	- e.g. classical control flow and dynamic lifting
 
-OpenQASM 3.0 is the standard de-jour
-and it has most of the features you might want.
-
-Classical techniques work surprisingly well for quantum computing.
 
 ---
 
+### Current state of the art:
+
+- OpenQASM 3.0 is the QASM standard de-jour
+	- It has most feature
+	- but lacks some critical stuff -> 
+- for language frontends, research presents some promising stuff
+	- lots of beautiful, expressive and verified languages
+- Despite this, python remains depressingly dominant in industry, because of its portability, flexibility and speed.
+- Semantics research is promising, but if we want to see industrial strength languages with formal semantics, a lot more work needs to be done, and quickly
+
+---
 ### What I didn't talk about:
 
 Other approaches to quantum computing
@@ -847,12 +945,20 @@ Other interesting problems:
 
 ---
 
+<style scoped>
+img { 
+	position: relative;
+	top: 0;
+	right:0
+}
+</style>
+
 Slides, markdown source and references can be found here:
 
-// todo link to a github gist
+https://github.com/JakeTrevor/talks/tree/main/qpl-survey
 
 or use this QR code:
+![](../qpl-survey/qr-code.png)
 
-// todo generate QRcode link
 
 Thank you for your time and attention!
