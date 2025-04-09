@@ -2,7 +2,6 @@
 paginate: true
 Abstract: Quantum computing is an exciting area for algorithmics, information theory and many other aspects of computer science. In this talk, I will discuss how this emerging field is relevant to programming languages. We will explore the interesting features of QC from a PL perspective; the state of the art in both high- and low-level approaches; unsolved problems and our best ideas for addressing them. No knowledge of QC is required - an extensive background will be provided.
 ---
-
 <style>
 
 section::after {
@@ -56,6 +55,22 @@ with a normalisation condition:
 $$|\alpha|^2 + |\beta|^2 = 1$$
 
 ---
+### Measurement
+
+When we **measure** a qubit, we can only observe it as being $\ket{0}$ or $\ket{1}$:
+
+$$
+\begin{align}
+\text P(\ket{0}) = |\alpha|^2\\
+\text P(\ket{1} )=|\beta|^2
+\end{align}
+$$
+
+**_Key Point:_** measurement is destructive
+
+After measurement, the state "collapses" and becomes either $\ket{0}$ or $\ket{1}$.
+
+---
 
 ### Multi-qubit States
 
@@ -93,6 +108,19 @@ These qubits are not separable - they are entangled.
 
 ---
 
+### Measuring entangled states
+
+When we have an entangled state, measuring a qubit impacts its entangled partners:
+
+$$
+\ket{\psi_{+}}  = \frac{1}{\sqrt{ 2 }} (\ket{00} + \ket{11}  )
+$$
+
+If we measure the first qubit here, we know the second one must have the same value.
+
+-> Measuring an entangled qubit collapses the entire entangled state!
+
+---
 ### This is all notational convention for vectors:
 
 $$
@@ -159,27 +187,6 @@ X \ket{0} = \ket{1}
 $$
 
 ---
-
-<!--
-### Basis and superposition
-
-Consider the following gate (the hadamard or $H$ gate):
-
-$$
-\begin{align}
-H = \frac{1}{\sqrt{ 2 }} \begin{bmatrix}
-1 & 1 \\
-1 & -1
-\end{bmatrix}
- &  &  &
-H\ket{0} = \frac{1}{\sqrt{ 2 }} (\ket{0} +\ket{1})
-\end{align}
-$$
-
-This takes a plain $\ket{0}$ to a _superposition_ of
-
---- -->
-
 There's also a controlled version - which $X$s the second bit only if the first one is $\ket{1}$:
 
 $$
@@ -198,7 +205,6 @@ CX \ket{00}  = \ket{00}  &  & CX \ket{11} = \ket{10}
 $$
 
 ---
-
 ### Circuits
 
 We can combine and compose gates to get more complex behaviour.
@@ -218,49 +224,17 @@ $$
 These combinations of gates are called circuits.
 
 ---
-
-### Measurement
-
-When we **measure** a qubit, we can only observe it as being $\ket{0}$ or $\ket{1}$:
-
-$$
-\begin{align}
-\text P(\ket{0}) = |\alpha|^2\\
-\text P(\ket{1} )=|\beta|^2
-\end{align}
-$$
-
-**_Key Point:_** measurement is destructive
-
-After measurement, the state "collapses" and becomes either $\ket{0}$ or $\ket{1}$.
-
----
-
-### Measuring entangled states
-
-When we have an entangled state, measuring a qubit impacts its entangled partners:
-
-$$
-\ket{\psi_{+}}  = \frac{1}{\sqrt{ 2 }} (\ket{00} + \ket{11}  )
-$$
-
-If we measure the first qubit here, we know the second one must have the same value.
-
--> Measuring an entangled qubit collapses the entire entangled state!
-
----
-
 ### So:
 
 Quantum computing is just complex-valued linear algebra with probabilities
 
 easy right?
 
+> For a more thorough treatment, see Nielson and Chuang (2000)
+
 ---
 
-#### An aside:
-
-### Quantum Teleportation
+### An aside - Quantum Teleportation
 
 **The basic idea**: transfer state from one qubit to another
 
@@ -283,7 +257,7 @@ def bell_pair() {
 def teleport(q) {
 	a, b <- bell_pair()
 	CX q a
-	H qx
+	H q
 	q', a' = M q a
 	if (a') X b
 	if (q') Z b
@@ -382,6 +356,7 @@ Compiler optimisation aims to find automatic ways to translate understandable co
 ---
 
 ### QPL
+
 ##### -- OR --
 ### Why should we care about the intersection of QC and PL?
 
@@ -418,6 +393,9 @@ Using QPLs, we can:
 - Provide a combined setting for practical, mixed algorithms
 
 ---
+## Challenges
+
+---
 
 ## The good news: classical control is OK
 
@@ -433,11 +411,12 @@ Using QPLs, we can:
 
 ### The bad news: QC is hard anyway
 
-Qubits exhibit three fiddly behaviours:
+There are four things we need to address:
 
 - non-locality
 - linearity
 - reversibility
+- dynamic lifting
 
 ---
 
@@ -458,6 +437,8 @@ In fact, the quantum state as a whole collapses - the other qubit also returns t
 
 ### Linearity (in the typing sense)
 
+Qubits are linear resources
+
 Measurement presents an obvious example of linear behaviour...
 
 ... but it's more general than just measurement
@@ -470,11 +451,12 @@ The No Cloning Theorem (A well known result):
 
 ### Reversibility
 
-- All quantum gates need to be reversible.
+- All quantum operations (apart from measurement) need to be reversible.
+- Often we want to take a classical function and generate a quantum implementation (called a 'quantum oracle').
 
-- This makes translating classical programs into the quantum realm a fraction more challenging.
+-> Reversibility makes this a fraction more challenging.
 
-- It's not generally a big problem - but it presents an interesting opportunity for more expressive code.
+- automatic reversion has applications in memory management and optimisation
 
 ---
 
@@ -488,11 +470,35 @@ A very fancy name for a very simple concept:
 a, b <- fresh
 H a
 x = M a
-if (x) X b
+if (x) X b 
+//  ^ x here is classical!
 ```
 
 - It requires special semantics
 - not all languages support it
+
+---
+### Dynamic lifting in quantum teleportation
+
+```
+def bell_pair() {
+	a, b <- fresh
+	H a
+	CX a b
+	return (a, b)
+}
+
+def teleport(q) {
+	a, b <- bell_pair()
+	CX q a
+	H q
+	q', a' = M q a
+	// Dynamic lifting:
+	if (a') X b
+	if (q') Z b
+	return b
+}
+```
 
 ---
 
@@ -541,18 +547,6 @@ We can broadly break down high-level quantum programming languages into three ca
 - Qiskit can run on real IBM QCs
 
 ---
-
-### Python isn't great
-
-- excellent for hacking at a problem and exploring quantum computing...
-- But QC in python will always be second class.
-- circuit description style is fast to learn, but ugly for larger programs/protocols
-- will never offer everything dedicated languages can
-- no strong semantics.
-- **Critically, it doesn't do anything interesting from a PL perspective**
-
----
-
 ### Quantum teleportation in Qiskit:
 
 ```python
@@ -565,19 +559,36 @@ teleport.cx(0, 1)
 teleport.h(0)
 teleport.measure([0, 1],[0, 1])
 
-with teleport.if_test((0, 1)):
+with teleport.if_test((0, 1)): # cbit 0 = 1?
     teleport.x(2)
-with teleport.if_test((1, 1)):
+with teleport.if_test((1, 1)): # cbit 1 = 1
     teleport.z(2)
 
 ```
 
 ---
+### Somethings to note:
 
+- no functions/subroutines
+- all lifetimes are program-static
+- no names - only indicies
+
+
+---
+### Python isn't great
+
+- excellent for hacking at a problem and exploring quantum computing...
+- But QC in python will always be second class.
+- circuit description style is fast to learn, but ugly for larger programs/protocols
+- will never offer everything dedicated languages can
+- no strong semantics.
+- **Critically, it doesn't do anything interesting from a PL perspective**
+
+---
 ### Q\#
 
-Introduced by microsoft.
-Think C\# but with Quantum glued in.
+Introduced by Microsoft.
+Syntactically very similar to C\#.
 
 Interops with CLR - so C\#, F\#, etc.
 
@@ -600,44 +611,51 @@ Q\# is interesting because it is not a circuit description language. It takes a 
 
 ---
 
-### The downsides:
-
-- Microsoft no longer support Q\#.
-- It has its own (non-standard) IR
-- no formal semantics;
-
-Q\# is not going to be the language of quantum computing.
-
----
-
-
-/// TODO check this is actually real code that works maybe?
 ```qsharp
 namespace Teleportation {
-    open Microsoft.Quantum.Intrinsic;
-    open Microsoft.Quantum.Canon;
-    open Microsoft.Quantum.Measurement;
-
-    operation bell_pair() : (Qubit, Qubit) {
-        use (a, b) = (Qubit(), Qubit());
-        H(a);
-        CNOT(a, b);
-        return (a, b)
-    }
-
-    operation Teleport (q : Qubit) : Qubit {
-        (a, b) = bell_pair()
-
-        CNOT(q, a);
-        H(q);
-
-        if (MResetZ(q) == One) { Z(b); }
-        if (MResetZ(a) == One) { X(b); }
-
-        return b
+	open Microsoft.Quantum.Intrinsic;
+	open Microsoft.Quantum.Canon;
+	open Microsoft.Quantum.Measurement;
+	
+	operation bell_pair(a: Qubit, b: Qubit) : Unit {
+		H(a);
+		CNOT(a, b);
+	}
+	
+	@EntryPoint()
+	operation Teleport () : Result {
+		use (q, a, b) = (Qubit(), Qubit(), Qubit());
+		X(q);
+		bell_pair(a, b);
+		CNOT(q, a);
+		H(q);
+		if (MResetZ(q) == One) { Z(b); }
+		if (MResetZ(a) == One) { X(b); }
+		return MResetZ(b);
 	}
 }
 ```
+
+---
+
+### Some things to note:
+
+- We do get functions!
+- But qubit lifetimes are now function-static 
+	- this is why the bell_pair fn is an awkward mutator, rather than a nice allocator
+	- we cannot return qubits from the function they are allocated within
+	- No in-editor warnings for functions that violate this lifetime constraint - you have to compile.
+		- Give me my squiggles!
+- I believe this is to make functors tractable
+
+---
+### The downsides:
+
+- Microsoft no longer support Q\#.
+- Doesn't target the standard QASM (it has it's own)
+- no formal semantics
+
+Q\# is not going to be the language of quantum computing.
 
 ---
 #### Research languages
@@ -649,7 +667,7 @@ Quipper is a functional PL developed at Dalhousie.
 
 Embedded in Haskell - install with cabal.
 
-**Despite its functional style, it's still a circuit description language.**
+-> **Still a circuit description language.**
 
 Quipper does not compile to any quantum assembly.
 It's not really intended to run on a real quantum computer.
@@ -670,9 +688,6 @@ Core fragments of quipper have been extracted and studied:
 ---
 
 ### Quipper
-
-%% TODO DATES! %%
-
 The overall goal: unify fragments and get a language with well defined semantics for everything.
 
 Interest seems to have died down of late - last paper was published in 2022
@@ -682,23 +697,30 @@ Interest seems to have died down of late - last paper was published in 2022
 ```haskell
 bell_pair :: Circ (Qubit, Qubit)
 bell_pair = do
-	x <- qinit False
-	y <- qinit False
-	x <- hadamard x
-	y <- qnot y ‘controlled‘ x
-	return (x, y)
+	a <- qinit False
+	b <- qinit False
+	a <- hadamard a
+	b <- qnot b ‘controlled‘ a
+	return (a, b)
 
 teleport :: Qubit -> Circ Qubit
 teleport q = do
-	x, y <- bell_pair
-	x <- qnot x ‘controlled‘ q
+	a, b <- bell_pair
+	a <- qnot a ‘controlled‘ q
 	q <- hadamard q
-	(q', x') <- measure (q,x)
-	y <- gate_Z y ‘controlled‘ q'
-	y <- gate_X y ‘controlled‘ x'
-	cdiscard (x,y)
-	return y
+	(q', a') <- measure (q,a)
+	b <- gate_Z b ‘controlled‘ q'
+	b <- gate_X b ‘controlled‘ a'
+	cdiscard (a, q)
+	return b
 ```
+
+---
+
+### Some things to note:
+- This is an embedding in Haskell - so we get functions and dynamic lifetimes
+-  controlled operations are not primitive
+	- rather there is a `controlled` function that can make any primitive operation into a controlled one.
 
 ---
 
@@ -749,6 +771,13 @@ def teleport(q: B) {
 ```
 
 ---
+### Some things to note:
+- nice native functions
+- with qubits that can leave their defining function!
+	- this doesn't really demonstrate the killer feature for silq
+	- A lot of the time, you don't need to reset/free/discard qubits when you are done.
+
+---
 
 ## Low Level approaches
 
@@ -776,9 +805,9 @@ For almost all of these topics, we need a well defined quantum assembly
 ---
 
 ### What do we want from a QIR/QASM?
-#### A good QASM should:
+
 - allow expression of most useful quantum programs
-	- include dynamic lifting &
+	- including dynamic lifting &
 	- classical control flow structures
 - support analyses and symbolic execution
 	- Or at least have a way to generate/earmark code friendly to such techniques
@@ -786,20 +815,24 @@ For almost all of these topics, we need a well defined quantum assembly
 	- support for functions and general code reuse
 	- Ideally with dynamic allocation
 
-As far as I am aware, No language supports all of these features
-- in fact, most don't even crack 50%. 
+---
+### Choosing the right primitives: Parametric gates
+
+- One of the features we (probably) don't want
+- Gates like X, Y, and Z correspond to rotations in a higher dimensional space
+- X = 180deg rotation about the X-axis
+- but there is nothing to stop you rotating by some other amount
+- Parametric gates allow you to specify the angle of rotation
+
+- These are bad because they make certain analyses intractable.
+
 
 ---
 
 ### ScaffCC/Scaff
-
-- An early attempt at a quantum assembly ("QASM")
-	- Inspired by Nielson and Chuang
-- Really interesting paper:
-	- explores compilation techniques for quantum computing
-- Some of the ideas explored were not great
-	- scaffCC's QASM uses a "flat" format, which avoids classical control flow
-	- The scaffCC paper serves as a great argument not to do it that way
+- A compiler for a language called 'scaffold' - which is embedded in C.
+- An early (2014) attempt at a quantum assembly ("QASM")
+- scaffCC's QASM uses a "flat" format, which avoids classical control flow
 
 ---
 ### ScaffCC: Flat codes
@@ -808,54 +841,46 @@ As far as I am aware, No language supports all of these features
 	- the entire program is a single basic block
 - all classical control flow is unrolled/evaluated, 
 - To get this to work, you specify the input size and all classical parameters of the problem you are trying to solve at compile time
+- Imagine the paralel for classical codes
 
 ---
 
 Flat codes are intractable for conventional compiler approaches. To get around this they introduced:
-- vectorisation
+- vectorisation (called 'looping')
 	- you can loop (or really, apply a gate) over slices of qubit vectors
-- functions
+- functions (call 'heirarchy')
 	- you can define reusable "modules" which mutate their input data (no return statement)
+
+-> In other words, they had to un-flatten the code
+
+ScaffCC targets 'QASM-HL'
 
 ---
 ### ScaffCC: Other features
 
 - ScaffCC includes a quantum oracle generator (called "classical-to-quantum-gate" or CTQG in the paper).
 - Also explored instrumentation-based approach to compilation
-- Rather than passes, scaff evaluates classical component of the program 
+	- Rather than passes, Scaff evaluates classical component of the program 
 	- quantum gate calls are emitted as output
-- automatically determines what classical elements need to be evaluated vs those that need to be integrated by CTQG.
+- automatically determines what classical elements need to be statically evaluated vs integrated by CTQG.
 
 ---
 
-In conclusion:
-
-A super interesting paper because it demonstrates a lot of weird stuff
-
+### Scaff - In conclusion:
+ScaffCC Explored lots of interesting ideas 
 But ScaffCC's QASM is not the QASM of the future.
 
+- I have no code sample for this because quantum teleportation cannot be represented in Scaffold/QASM-HL  no dynamic lifting
+- Scaff also uses parametric gates
 
 ---
-
 ### OQASM
 
 Self described 'quantum circuit intermediate language'
-
-- developed alongside quiskit
-- (I think) there are many pre-built optimistaion techniques
-
-paramatrised gates
-
--> qubits can be represented as points on the surface of a sphere.
-
-- various quantum gates correspond to rotations in that space
-- its possible to specify the precise angle of rotation as a prameter to the operation
-
-This causes many headaches for analysis and optimisation.
-
-No functions - only subroutines
-subroutines cannot allocate qubits.
-
+- supported by IBM & partners
+- currently, the de-facto standard
+- developed alongside qiskit
+- (I think) there are many pre-built optimistaions
 ---
 
 ### Quantum teleportation in OpenQASM 3.0
@@ -882,29 +907,28 @@ if (result[1]) {
 ```
 
 ---
-### QIR
+### Some things to note:
 
-- developed alongside Q#
+- though no example here, OQASM has parametric gates
+	- in fact, U (x, y, z) is the primitive from which X, Y and Z are derived.
+- No functions - only subroutines
+	- subroutines cannot allocate qubits.
+
+---
+## Conclusions
 
 ---
 
-### QSSA
-
-- A single static assignment form for quantum computing
-- build with LLBM
-- Requires an extra check to enforce qubit linearity
-- Demonstrated that classical optimisations (sans copying) can work on quantum code
-  -> actually, the performance was almost as good in many cases as the hand-rolled quantum optimiser.
-
----
-### Takeaways:
+### Key Takeaways:
 
 - QPL is a hot research topic with lots of interesting problems
 	- even non-quantum elements ripe for exploration
 - QPL suffers from a lack of cohesion
 	- work often does not connect together well
+	- Particularly bad in terms of academic ideas moving across to industry
 - Even basic features are sporadically distributed 
 	- e.g. classical control flow and dynamic lifting
+	- though this is getting better in newer languages
 
 
 ---
@@ -912,8 +936,8 @@ if (result[1]) {
 ### Current state of the art:
 
 - OpenQASM 3.0 is the QASM standard de-jour
-	- It has most feature
-	- but lacks some critical stuff -> 
+	- It has most features you need 
+	- but it also has some problems
 - for language frontends, research presents some promising stuff
 	- lots of beautiful, expressive and verified languages
 - Despite this, python remains depressingly dominant in industry, because of its portability, flexibility and speed.
@@ -922,20 +946,26 @@ if (result[1]) {
 ---
 ### What I didn't talk about:
 
+The section of quantum assemblies used to be much longer; in particular its worth looking at:
+- QIR
+- QSSA
+
 Other approaches to quantum computing
 
 - e.g. quantum annealing
 
-Other interesting problems:
+
+---
+### Other interesting problems:
 
 - Networking
   - many interesting quantum algs. are cryptographic & meant to involve communication.
 - Memory management
   - currently all qubit allocation is strictly static
-  - In fact it's often even worse than that - tools like Quiskit don't even have a stack; all qubits must be allocated at startup.
+  - In fact it's often even worse than that - tools like Qiskit don't even have a stack; all qubits must be allocated at startup.
 
 ---
-
+### (More) Interesting problems
 - Cost modelling
   - I briefly mentioned this, but modelling costs for QC is critically important for effective optimisation
   - its also quite complicated, and very hardware dependent.

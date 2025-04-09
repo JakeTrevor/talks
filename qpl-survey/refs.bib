@@ -1,0 +1,88 @@
+%% For a more thorough background on QC: %%
+@book{NielsonChuang2000,
+	author={Nielsen,Michael A. and Chuang,Isaac L.},
+	year={2000},
+	title={Quantum computation and quantum information},
+	publisher={Cambridge University Press},
+	address={Cambridge;New York;},
+	keywords={Quantum computers},
+	isbn={9780521632355;0521635039;0521632358;9780521635035;},
+	language={English},
+}
+
+
+%% Q#: %%
+@inproceedings{Svore2010,
+	author = {Svore, Krysta and Geller, Alan and Troyer, Matthias and Azariah, John and Granade, Christopher and Heim, Bettina and Kliuchnikov, Vadym and Mykhailova, Mariia and Paz, Andres and Roetteler, Martin},
+	title = {Q#: Enabling Scalable Quantum Computing and Development with a High-level DSL},
+	year = {2018},
+	isbn = {9781450363556},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	url = {https://doi.org/10.1145/3183895.3183901},
+	doi = {10.1145/3183895.3183901},
+	booktitle = {Proceedings of the Real World Domain Specific Languages Workshop 2018},
+	articleno = {7},
+	numpages = {10},
+	keywords = {domain specific language, functional programming, quantum computing},
+	location = {Vienna, Austria},
+	series = {RWDSL2018}
+}
+
+%% For details of Quipper, see the following and references within: %%
+@article{Fu2023,
+	author = {Fu, Peng and Kishida, Kohei and Ross, Neil J. and Selinger, Peter},
+	title = {Proto-Quipper with Dynamic Lifting},
+	year = {2023},
+	issue_date = {January 2023},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {7},
+	number = {POPL},
+	url = {https://doi.org/10.1145/3571204},
+	doi = {10.1145/3571204},
+	abstract = {Quipper is a functional programming language for quantum computing. Proto-Quipper is a family of languages aiming to provide a formal foundation for Quipper. In this paper, we extend Proto-Quipper-M with a construct called dynamic lifting, which is present in Quipper. By virtue of being a circuit description language, Proto-Quipper has two separate runtimes: circuit generation time and circuit execution time. Values that are known at circuit generation time are called parameters, and values that are known at circuit execution time are called states. Dynamic lifting is an operation that enables a state, such as the result of a measurement, to be lifted to a parameter, where it can influence the generation of the next portion of the circuit. As a result, dynamic lifting enables Proto-Quipper programs to interleave classical and quantum computation. We describe the syntax of a language we call Proto-Quipper-Dyn. Its type system uses a system of modalities to keep track of the use of dynamic lifting. We also provide an operational semantics, as well as an abstract categorical semantics for dynamic lifting based on enriched category theory. We prove that both the type system and the operational semantics are sound with respect to our categorical semantics. Finally, we give some examples of Proto-Quipper-Dyn programs that make essential use of dynamic lifting.},
+	journal = {Proc. ACM Program. Lang.},
+	month = jan,
+	articleno = {11},
+	numpages = {26},
+	keywords = {quantum programming languages, dynamic lifting, categorical semantics, Quipper, Proto-Quipper}
+}
+
+%% Silq: %%
+@inproceedings{Bichsel2020,
+	author = {Bichsel, Benjamin and Baader, Maximilian and Gehr, Timon and Vechev, Martin},
+	title = {Silq: a high-level quantum language with safe uncomputation and intuitive semantics},
+	year = {2020},
+	isbn = {9781450376136},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	url = {https://doi.org/10.1145/3385412.3386007},
+	doi = {10.1145/3385412.3386007},
+	abstract = {Existing quantum languages force the programmer to work at a low level of abstraction leading to unintuitive and cluttered code. A fundamental reason is that dropping temporary values from the program state requires explicitly applying quantum operations that safely uncompute these values.  We present Silq, the first quantum language that addresses this challenge by supporting safe, automatic uncomputation. This enables an intuitive semantics that implicitly drops temporary values, as in classical computation. To ensure physicality of Silq's semantics, its type system leverages novel annotations to reject unphysical programs.  Our experimental evaluation demonstrates that Silq programs are not only easier to read and write, but also significantly shorter than equivalent programs in other quantum languages (on average -46\% for Q#, -38\% for Quipper), while using only half the number of quantum primitives.},
+	booktitle = {Proceedings of the 41st ACM SIGPLAN Conference on Programming Language Design and Implementation},
+	pages = {286–300},
+	numpages = {15},
+	keywords = {Quantum Language, Semantics, Uncomputation},
+	location = {London, UK},
+	series = {PLDI 2020}
+}
+
+
+%% ScaffCC: %%
+@inproceedings{JavadiAbhari2014,
+author = {JavadiAbhari, Ali and Patil, Shruti and Kudrow, Daniel and Heckey, Jeff and Lvov, Alexey and Chong, Frederic T. and Martonosi, Margaret},
+title = {ScaffCC: a framework for compilation and analysis of quantum computing programs},
+year = {2014},
+isbn = {9781450328708},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2597917.2597939},
+doi = {10.1145/2597917.2597939},
+booktitle = {Proceedings of the 11th ACM Conference on Computing Frontiers},
+articleno = {1},
+numpages = {10},
+keywords = {reversible logic, quantum computation, compilers},
+location = {Cagliari, Italy},
+series = {CF '14}
+}
