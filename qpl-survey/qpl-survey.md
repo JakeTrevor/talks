@@ -57,7 +57,7 @@ $$|\alpha|^2 + |\beta|^2 = 1$$
 ---
 ### Measurement
 
-When we **measure** a qubit, we can only observe it as being $\ket{0}$ or $\ket{1}$:
+When we **measure** a qubit, we can only observe it as being in a basis state (either $\ket{0}$ or $\ket{1}$):
 
 $$
 \begin{align}
@@ -183,6 +183,24 @@ X = \begin{bmatrix}
 \end{bmatrix}
 &&&&
 X \ket{0} = \ket{1}
+\end{align}
+$$
+---
+$$
+\begin{align}
+X \ket{0} &= \begin{bmatrix}
+0 & 1 \\
+1 & 0 \\
+\end{bmatrix} \begin{bmatrix}
+1 \\
+0
+\end{bmatrix}  \\
+&=
+\begin{bmatrix}
+0 \\
+1
+\end{bmatrix} \\
+&= \ket{1} 
 \end{align}
 $$
 
@@ -393,6 +411,12 @@ Using QPLs, we can:
 - Provide a combined setting for practical, mixed algorithms
 
 ---
+
+#### Of course most important of all:
+
+### You get to say you work in quantum computing
+
+---
 ## Challenges
 
 ---
@@ -435,7 +459,7 @@ In fact, the quantum state as a whole collapses - the other qubit also returns t
 
 ---
 
-### Linearity (in the typing sense)
+### Linearity (in the resource sense)
 
 Qubits are linear resources
 
@@ -451,7 +475,9 @@ The No Cloning Theorem (A well known result):
 
 ### Reversibility
 
-- All quantum operations (apart from measurement) need to be reversible.
+- A result of the unitary property of quantum gates
+- All quantum operations (apart from measurement) are reversible.
+	- any construction is also therefore reversible.
 - Often we want to take a classical function and generate a quantum implementation (called a 'quantum oracle').
 
 -> Reversibility makes this a fraction more challenging.
@@ -880,7 +906,7 @@ Self described 'quantum circuit intermediate language'
 - supported by IBM & partners
 - currently, the de-facto standard
 - developed alongside qiskit
-- (I think) there are many pre-built optimistaions
+
 ---
 
 ### Quantum teleportation in OpenQASM 3.0
@@ -983,7 +1009,7 @@ img {
 }
 </style>
 
-Slides, markdown source and references can be found here:
+Slides and markdown source can be found here:
 
 https://github.com/JakeTrevor/talks/tree/main/qpl-survey
 
