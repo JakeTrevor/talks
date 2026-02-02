@@ -1,0 +1,21 @@
+\documentclass[crop,tikz]{standalone}
+\usepackage{tikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+
+\node [draw] (sched) at (0,0)                   [align=center] {\textbf{Scheduler}};
+\node [draw] (qpu) [right of=sched] [xshift=40] [align=center] {\textbf{QPU}};    
+
+\draw[->] (sched) to [bend left=45] 
+    node[midway,above] {Instructions}
+    (qpu);
+
+\draw[->] (qpu) to [bend left=45] 
+    node[midway,below] {Results}
+    (sched);
+
+\end{tikzpicture}
+
+\end{document}

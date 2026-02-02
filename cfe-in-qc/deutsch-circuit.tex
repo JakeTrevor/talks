@@ -1,0 +1,16 @@
+\documentclass[crop,tikz]{standalone}
+\usepackage{braket}
+\usepackage{tikz}
+\usetikzlibrary{quantikz2}
+
+
+\newcommand{\zero}{\ensuremath{\ket{0}}}
+
+\begin{document}
+
+\begin{quantikz}
+\lstick{\zero} & \gate{X} & \gate{H} & \gate[2]{f} & \gate{H} & \meter{} \\
+\lstick{\zero} &          & \gate{H} &             &          &
+\end{quantikz}
+
+\end{document}

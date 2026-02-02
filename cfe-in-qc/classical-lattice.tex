@@ -1,0 +1,13 @@
+\documentclass[crop,tikz]{standalone}
+\usepackage{tikz}
+
+\begin{document}
+\begin{tikzpicture}
+    \node [draw] (loops) at (0,0)              [align=center]        {\textbf{While loops}};
+    \node [draw] [below of=loops] [yshift=-10] [align=center] (if)   {\textbf{If statements}};
+    \node [draw] [below of=if]    [yshift=-10] [align=center] (flat) {\textbf{Flat code}};
+
+    \draw [black, thick] (loops) -- (if);
+    \draw [black, thick] (if) -- (flat);
+\end{tikzpicture}
+\end{document}

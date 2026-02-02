@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "0dddd55c01172cfa",
+        "id": "2786403fe0c5827d",
         "type": "tabs",
         "children": [
           {
-            "id": "ce0af2468a70e200",
+            "id": "9bb79ed055a7bcad",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "qpl-survey/qpl-survey.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "qpl-survey"
+              "title": "New tab"
             }
           }
         ]
@@ -78,7 +74,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "918db7b65cbb4d85",
@@ -164,9 +161,11 @@
       "table-editor-obsidian:Advanced Tables Toolbar": false
     }
   },
-  "active": "ce0af2468a70e200",
+  "active": "9bb79ed055a7bcad",
   "lastOpenFiles": [
     "qpl-survey/qpl-survey.md",
+    "Meeting notes.md",
+    "qpl-survey/questions.md",
     "scratch.md",
     "qpl-survey/refs.bib",
     "qpl-survey/teleport.png",
@@ -199,7 +198,6 @@
     "notes/Measurement.md",
     "notes/Symbol Tables.md",
     "Glossary.md",
-    "thoughts/Categories.md",
     "notes/QC Course notes",
     "thoughts",
     "QPL Survey.html",

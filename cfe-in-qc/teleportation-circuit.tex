@@ -1,0 +1,17 @@
+\documentclass[crop,tikz]{standalone}
+\usepackage{braket}
+\usepackage{tikz}
+\usetikzlibrary{quantikz2}
+
+
+\newcommand{\zero}{\ensuremath{\ket{0}}}
+
+\begin{document}
+
+\begin{quantikz}
+    \lstick{$\ket{\phi}$} &          &          & \ctrl{1} &                        & \meter{} \wire[d][2]{c} \\
+    \lstick{\zero}        & \gate{H} & \ctrl{1} & \targ{}  & \meter{}\wire[d][1]{c} \\
+    \lstick{\zero}        &          & \targ{}  &          & \gate{X}               & \gate{Z} & \rstick{$\ket{\phi}$}
+\end{quantikz}
+
+\end{document}
