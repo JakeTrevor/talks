@@ -29,6 +29,16 @@ blockquote {
     flex-direction: row;
     justify-content: center;
 }
+
+.light {
+    color: 'gray';
+}
+
+.top {
+    position: fixed;
+    top: 20vh;
+}
+
 </style>
 
 $$
@@ -38,6 +48,8 @@ $$
 \newcommand{\checkout}{\texttt{Checkout }}
 \newcommand{\prop}{\text{Prop}}
 \newcommand{\hist}[1]{H\text{<}#1\text{>}}
+\newcommand{\grey}[1]{\textcolor{grey}{#1}}
+\newcommand{\lens}[2]{\mathcal L\ #1\ #2}
 $$
 
 # Package Managers, through a lens or two
@@ -46,9 +58,11 @@ $$
 
 ---
 
-## If you want to follow along
+## Disclaimers:
 
-Slides are here:
+- Mot my main line of work
+    - There are some holes
+- Not a PL talk - just PL themed
 
 ---
 
@@ -78,13 +92,23 @@ Some are a little more exotic:
 
 - Despite how ubiquitous PMs are, no one spends any time thinking about them
 
-- ... because if you are thinking about your package manager, something has gone wrong.
+- ... because if you are thinking about your package manager, something has gone wrong
 
 - A good package manager is a _hygiene factor_ - you notice it only by its absence
 
 > No one notices a clean bathroom
 
-##### Similarly, no one ever wants to think about `pip`.
+##### Similarly, no one ever wants to think about `pip`
+
+---
+
+## What should you take out of this talk?
+
+- How can we characterise good behaviour for package managers?
+    - both informally
+    - and formally
+- One potential idea for how to formalise good behaviour
+- Maybe some learning about lenses
 
 ---
 ## What is a package manager?
@@ -100,37 +124,6 @@ Almost no one gets #1 wrong
 But the rest is a lottery!
 
 ---
-<!-- 
-## Extended behaviour:
-
-There are also extensions *really good* package managers include:
-
-- **Uninstallation** 
-    - remove packages cleanly 
-    -> surprisingly rare, especially with system PMs
-- **Reversibility** 
-    - undo an action safely (Nix can do this)
-- **Declarative & imperative interfaces**  
-    - i.e. `npm install` matches `package.json`
-    - but `npm install <pkg>` updates it
-
-I'm not going to talk about these in detail today
-
---- -->
-<!-- 
-## Picture of an evil package manager: 
-# Pip
-
----
-## Why does pip suck?
-
-pip gets lots of things wrong:
-
-```sh
-$ pip install --upgrade pip 
-```
-
-> If you run this without root, pip will uninstall itself. -->
 
 ## What is a good package manager?
 
@@ -144,21 +137,29 @@ $ pip install --upgrade pip
 
 ### Lenses
 
-A lens $\mathcal L\ \Gamma\ \Delta$ on two types $\Gamma, \Delta$ is a pair of functions 
+A lens $\mathcal L\ \Gamma\ \Delta$ is a structure on two types $\Gamma, \Delta$ 
 
-$$
-\begin{align*}
-\texttt{Get } (\downarrow) &: \Gamma \to \Delta & 
-\texttt{Put }(\uparrow) &: \Delta \times \Gamma \to \Gamma
-\end{align*}
-$$
 
-$\Gamma$ is the source type - it represents '_the truth_'
 
-$\Delta$ is the target type - it represents a _view_ of the truth
+$\Gamma$ is the _source_ type
+
+$\Delta$ is the _target_ type - it's a _view_ on the source
 
 ---
 
+## Lenses
+
+A lens is just a pair of functions:
+
+$$
+\begin{align*}
+\get&: \Gamma \to \Delta & 
+\put&: \Delta \times \Gamma \to \Gamma
+\end{align*}
+$$
+
+
+---
 ### Lens Laws:
 
 A lens is _well behaved_ if it obeys the lens laws:
@@ -169,17 +170,20 @@ $$
 &\forall\ \left(i : \Gamma\right)\ \left(x: \Delta\right), \\
 \text{put-get} &&
 \text{get-put} \\
-\downarrow (\uparrow x\ i) = x &&
-\uparrow (\downarrow i)\ i = i
+\get (\put x\ i) = x &&
+\put (\get i)\ i = i
 \end{gather*}
 $$
 
-and _very well behaved_ if it is idempotent:
+---
+### Lens Laws:
+
+A lens is _very well behaved_ if it is also idempotent:
 
 $$
 \begin{gather*}
 \text{put-put}\\
-\uparrow x\ (\uparrow x\ i) =\ \uparrow x\ i
+\put x\ (\put x\ i) =\ \put x\ i
 \end{gather*}
 $$
 
@@ -189,8 +193,8 @@ $$
 
 Morally, this seems like it might be a good model...
 
-- We have some notion of _the truth_ $\left(\Gamma\right)$ (the remote package repository)
-- We want a _view of the truth_ $\left(\Delta\right)$ (our local installation of packages)
+- We have some notion of a source type $\left(\Gamma\right)$ (the remote package repository)
+- We want a _view_ on that source type $\left(\Delta\right)$ (our local installation of packages)
 
 but the devil is in the details
 
@@ -201,7 +205,7 @@ Let's say that we have:
 - a type $P$ of package names
 - and for each package $p : P$, a body of type $B$
 
-A package manager is then a collection of lenses.
+A package manager is then a collection of lenses
 
 ---
 ## Package lenses:
@@ -216,34 +220,44 @@ For each subset of package names $P' \subseteq P$, we have a target type, which 
 $$\Delta_{P'} = P' \to B$$
 
 ---
+
+## Can we mechanise this?
+
+---
 ## Package lenses:
 
-In lean, we set this up using the _characteristic predicate_ of the subset:
+In lean, we define subsets by their _characteristic predicate:_
+
+> e.g. $hP'$ = is $p$ in the subset $P' \subseteq P$?
 
 ```lean4
--- given h : P -> Pro
+-- given h : P -> Prop
 
 type P' = { p : P // h p }
 
 type P' = Subtype h
 ```
 
+---
+
 The _package manager_ itself can be understood as a function from the choice of packages to the corresponding lens:
 
-$$\text{PLens} : (h : P \to \text{Prop}) \to \mathcal L\ \Gamma\ \Delta_{P'}$$
+$$\text{PLens} : (hP' : P \to \text{Prop}) \to \mathcal L\ \Gamma\ \Delta_{P'}$$
 
 
 ---
 ## Package lenses:
 
-In this formalism, we have a pleasing set of subtypes: $P' <: P$ and $\Gamma <: \Delta_{P'}$
+In this formalism, since $P' <: P$, $\Gamma <: \Delta_{P'}$
 
-So $\get$is just a cast from $\Gamma$ to $\Delta_{P'}$.
+So $\get$is just a cast from $\Gamma$ to $\Delta_{P'}$
 
 ```lean4
 get : (P -> Prop) -> (Subtype h -> Prop)
 get := fun γ p => γ p
 ```
+
+<!-- We "mask off" the parts of $\gamma$ that we don't want to see in our $\delta$ -->
 
 ---
 ## Package lenses:
@@ -257,6 +271,8 @@ put := fun (δ, γ) p =>
     then δ p 
     else γ p
 ```
+
+<!-- We _overlay_ our $\delta$ onto our $\gamma$. -->
 
 ---
 
@@ -277,9 +293,9 @@ put := fun (δ, γ) p =>
 ## The Problem: Dependency war
 
 - Let's say that I use package $\text{B}$
-* and $\text{B}$ depends on $\text{A}$ version 1.
+* and $\text{B}$ depends on $\text{A}$ version 1
 * Let's say I also want to use $\text{C}$
-* which depends on $\text{A}$ version 2.
+* which depends on $\text{A}$ version 2
 
 * Some combinations of packages are _impossible_  
 * How should a well behaved package manager deal with this?
@@ -292,8 +308,9 @@ put := fun (δ, γ) p =>
 ---
 ## Dependencies: Internal
 
-- Often, a package _completely encapsulates_ its dependencies.
-- In this case, the dependencies are **internal** to the package.
+- Sometimes, a package _completely encapsulates_ its dependencies
+    - e.g. if there's no way to tell that A depends on B from the A's interface alone
+- In this case, the dependencies are **internal** to the package
 
 -> We can use the package without knowing about its dependencies
 
@@ -303,20 +320,20 @@ put := fun (δ, γ) p =>
 > Packages can be _leaky_
 
 - What if types from a dependency appear in the public interface of the package?
-- Then the user of the package is _exposed_ to the dependencies.
+- Then the user of the package is _exposed_ to the dependencies
 - These are called **external** dependencies
 
 ---
 ## To be clear:
 
-- External dependencies make solving dependency war very hard.
+- External dependencies make solving dependency war very hard
 #### My view:
 
-- Dependency war between external dependencies in packages is _not_ a technical problem.
-- It's fundamental to the implementation of the packages.
+- Dependency war between external dependencies in packages is _not_ a technical problem
+- It's fundamental to the implementation of the packages
 
-> Some sets of packages are _incompatible._
-> Nothing a package manager can do will solve this.
+> Some sets of packages are _incompatible_
+> Nothing a package manager can do will solve this
 
 ---
 ## Aside: Can we fix it?
@@ -336,7 +353,7 @@ $\therefore$ it's weird to use two versions of the same thing
 
 ---
 
-**However**, dependency war between internal dependencies should not be an issue.
+**However**, dependency war between internal dependencies should not be an issue
 
 #### Solution: Dependency Locality
 
@@ -370,7 +387,7 @@ There's an extensive body of work on module systems, such as:
 - **backpack** for haskell (Kilpatrick & al.)
 - $\Pi$ - a language agnostic module calculus; unpublished (Florisson & Mycroft)
 
-These are much more complicated than I have time to go into here, and also a little out of scope.
+These are much more complicated than I have time to go into here, and also a little out of scope
 
 ---
 ## Versions
@@ -415,6 +432,9 @@ $$
 \end{align*}
 $$
 
+---
+### VCS semantics
+
 This might look familiar...
 
 $$
@@ -424,6 +444,9 @@ $$
 \get = \checkout && \put = \commit
 \end{gather*}
 $$
+
+---
+## VCS semantics
 
 There's an infinite family of version control lenses (VCLs), constructed by the function:
 $$
@@ -440,7 +463,7 @@ $$
 
 - If I check something out, and try to commit it, nothing will happen
 
--> since Git will not (by default) allow empty commits.
+-> since Git will not (by default) allow empty commits
 $$
 \commit (\checkout i)\ i = i
 $$
@@ -500,10 +523,11 @@ $$\text{PLens ref} : \mathcal L\ (P \to \hist B)\ (\text{Subtype ref} \to \hist 
 
 We can construct a VCL on those histories:
 
-$$VCL : \mathcal L\ (\hist B\times \text{Hash})\ B$$
+$$\text{VCL } B: \mathcal L\ (\hist B\times \text{Hash})\ B$$
 
 
-Here are two other lenses:
+---
+## Here are two other lenses:
 
 $$
 \begin{gather*}
@@ -515,10 +539,10 @@ $$
 
 These are both vwb. (proofs in lean)
 
+We will need these later
+
 ---
 ## Constructions on lenses:
-
-
 
 Lenses can be tensored (parallel composition):
 $$\_ \otimes \_: \mathcal L\ A\ B \to \mathcal L\ C\ D \to \mathcal L\ (A \times C)\ (B \times D)$$
@@ -533,25 +557,109 @@ $$\_ \text{ split } \_ : \mathcal L\ A\ (B \to C) \to \mathcal L\ C\ D \to \math
 > These constructions are _behaviour preseving_ - their output is vwb. when the input lenses are.
 
 ---
+
+## We can use these lenses and constructions to define a formalism for _versioned package lenses_
+
+* This is a little complex, so we will go through it slowly
+* It's OK if you don't follow this completely
+
+---
 ## What we get: Versioned Package Lenses
 
+$$
+\text{VPL ref} : (P \to \prop) \to \mathcal L\ ((P \to \hist B) \times V_{P'})\ (P' \to B)
+$$
+
+---
+
+$$
+\text{VPL ref} = 
+((\text{PLens ref} \otimes \text{ID})
+    \circ \text{Concentrate})\
+    \text{split}\ (\text{VCL }B)
+$$
+
+---
+
+<div class="top">
+
+$$
+\text{VPL ref} = 
+\grey{(}(\text{PLens ref} \otimes \text{ID})
+    \grey{\circ \text{Concentrate})\
+    \text{split}\ (\text{VCL }B)}
+$$
+
+</div>
+
+$$ 
+(\text{PLens ref} \otimes \text{ID}) : \lens{((P \to \hist B)\times V_{P'})\ \ \ }{((P' \to \hist B)\times V_{P'})}
+$$
+
+---
+
+<div class='top'>
+
+$$
+\text{VPL ref} = 
+((\text{PLens ref} \otimes \text{ID})
+    \circ \text{Concentrate})\
+    \grey{\text{split}\ (\text{VCL }B)}
+$$
+
+</div>
+
+Recall that $V_{P'}$ is just $(p:P') \to V_p$
+
+$$ 
+\begin{align*}
+    &(\text{PLens ref} \otimes \text{ID}) \circ \text{Concentrate} \\
+    &: \lens{((P \to \hist B)\times V_{P'})\ \ \ }{(P' \to (\hist B \times V_p))}
+\end{align*}
+$$
+
+
+---
+
+<div class='top'>
+
+$$
+\text{VPL ref} = 
+((\text{PLens ref} \otimes \text{ID})
+    \circ \text{Concentrate})\
+    \text{split}\ (\text{VCL }B)
+$$
+
+</div>
+
+$\hist B \times V_p$ is exactly the source type of our version control lens
+
+$$ 
+\begin{align*}
+    &((\text{PLens ref} \otimes \text{ID})
+    \circ \text{Concentrate})\
+    \text{split}\ (\text{VCL }B)\\
+    &: \lens{((P \to \hist B)\times V_{P'})\ \ \ }{(P' \to B)}
+\end{align*}
+$$
+
+---
+## What we get: Versioned Package Lenses
 
 $$
 \begin{align*}
-\text{VPL ref} = 
-((\text{PLens ref} &\otimes \text{ID})\\
-    &\circ \text{Concentrate})\\
-    &\text{split}\ (\text{VCL})\\
-: (P \to \prop) \to \mathcal L \\
-&((P \to \hist B) \times V_{P'})\\
-&(P' \to B)
+    \text{VPL ref} 
+    &= ((\text{PLens ref} \otimes \text{ID}) \circ \text{Concentrate}) \text{split}\ (\text{VCL }B)\\
+    & : (P \to \prop) \to \mathcal L\ ((P \to \hist B) \times V_{P'})\ (P' \to B)
 \end{align*}
 $$
 
 Since this is formed only by vwb. lenses and behaviour preserving constructions, the result is also vwb.
 
 ---
+## If you didn't follow, the key take away is:
 
+---
 ## What we get isn't quite what we wanted
 
 $$
@@ -589,17 +697,17 @@ Intuitively: $\put$can change our choice of versions
 
 It may well be that a different approach might yield a more pleasing result
 
-wherein versions are names are treated more similarly.
+wherein versions are names are treated more similarly
 
 Food for thought
 
 ---
 ## The wrinkles
 
-- Since the formalisation of VCL is not done, I don't have a verified proof that this is all OK just yet.
-- At present, while 'tensoring' is morally right, it's not sufficient.
+- Since the formalisation of VCL is not done, I don't have a verified proof that this is all OK just yet
+- At present, while 'tensoring' is morally right, it's not sufficient
+- The type of Hashes depends on the value of history, so
 - We need a dependent tensor - where the second argument can depend on the first
-
 
 ---
 ## Take care!
@@ -678,3 +786,12 @@ Some references:
 [1] Florisson & Mycroft, _Towards a Theory of Packages_  _unpublished draft_ (2016)
 [2] Rossberg & Dreyer, _Mixin’ Up the ML Module System_ (2013)
 [3] Kilpatrick & al, _Backpack: Retrofitting Haskell with Interfaces_ (2014)
+
+----
+
+
+## Over cakes:
+
+What's your most hated package manager?
+
+Can you think of bad behaviour that isn't captured by this model?

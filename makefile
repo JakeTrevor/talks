@@ -3,7 +3,7 @@ package-html: package-manager/talk.md out/package-manager/diagram.png
 	
 package: package-manager/talk.md out/package-manager/diagram.png
 	marp package-manager/talk.md --pdf --allow-local-files -o ./out/package-manager.pdf
-
+	
 
 cfe: cfe-in-qc/talk.md out/cfe-in-qc/classical-lattice.png out/cfe-in-qc/quantum-lattice.png out/cfe-in-qc/deutsch-circuit.png out/cfe-in-qc/teleportation-circuit.png out/cfe-in-qc/co-processor-architecture.png out/cfe-in-qc/co-processor-dyn-lift.png out/cfe-in-qc/reduced-quantum-lattice.png out/cfe-in-qc/labelled-reduced-quantum-lattice.png
 	marp cfe-in-qc/talk.md --pdf --allow-local-files -o ./out/cfe-in-qc.pdf
