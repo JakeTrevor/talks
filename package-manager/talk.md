@@ -303,7 +303,7 @@ put := fun (δ, γ) p =>
 ---
 ## Dependency war
 
-![](./package-manager/diagram.png)
+![](../out/package-manager/diagram.png)
 
 ---
 ## Dependencies: Internal

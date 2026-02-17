@@ -287,7 +287,7 @@ def teleport(q) {
 
 and as a circuit diagram:
 
-![](../qpl-survey/teleport.png)
+![](../out/qpl-survey/teleport.png)
 
 ---
 
