@@ -1,3 +1,10 @@
+react-html: react/talk.md
+	marp react/talk.md --html --allow-local-files -o ./out/react.html --watch
+
+react: react/talk.md
+	marp react/talk.md --pdf --allow-local-files -o ./out/react.pdf
+
+
 package-html: package-manager/talk.md out/package-manager/diagram.png
 	marp package-manager/talk.md --html --allow-local-files -o ./out/package-manager.html --watch
 	
