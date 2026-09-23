@@ -1,3 +1,6 @@
+p-and-p-rubber-duq: plug-and-play/rubber-duq.typ
+	typst compile plug-and-play/rubber-duq.typ out/plug-and-play-rubber-duq.pdf
+
 react-html: react/talk.md
 	marp react/talk.md --html --allow-local-files -o ./out/react.html --watch
 
