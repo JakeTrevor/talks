@@ -1,3 +1,6 @@
+out/what-i-did-this-summer.pdf: what-i-did-this-summer/what-i-did-this-summer-2026.typ
+	typst compile what-i-did-this-summer/what-i-did-this-summer-2026.typ out/what-i-did-this-summer-2026.pdf
+
 p-and-p-rubber-duq: plug-and-play/rubber-duq.typ
 	typst compile plug-and-play/rubber-duq.typ out/plug-and-play-rubber-duq.pdf
 
