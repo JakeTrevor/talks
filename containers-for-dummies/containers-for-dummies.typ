@@ -539,8 +539,8 @@ def Template.instance (T : Template) (E : Type) :=
 
 ```lean
 structure Container where
-  | shape : Type
-  | pos   : shape -> Type
+  shape : Type
+  pos   : shape -> Type
 
 def Container.extension (C : Container) (E : Type) :=
   ∑ x : C.shape, (C.pos x -> E)
@@ -587,7 +587,7 @@ $
 
 It's defined like this:
 $
-  [| S triangle.r P |] E := Sigma" "s : S, (P s -> E)
+  [| S triangle.l P |] E := Sigma" "s : S, (P s -> E)
 $
 
 #pause
@@ -646,7 +646,7 @@ Question: What data type corresponds to the fixpoint of `list`?
 #alternatives[
 
   $
-    [| S triangle.r P |] X := Sigma" "s : S, (P s -> X)
+    [| S triangle.l P |] X := Sigma" "s : S, (P s -> X)
   $
 
   - $(A -> B)$ is a type
@@ -656,7 +656,7 @@ Question: What data type corresponds to the fixpoint of `list`?
   - So we rewrite our expressions at the top to...
 ][
   $
-    [| S triangle.r P |] X := Sigma" "s : S, X^(P s)
+    [| S triangle.l P |] X := Sigma" "s : S, X^(P s)
   $
   - Sigma types = sum over possible values in a type
   - function spaces = generalised exponents
