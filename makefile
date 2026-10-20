@@ -1,3 +1,6 @@
+out/containers-for-dummies.pdf: containers-for-dummies/containers-for-dummies.typ
+	typst compile containers-for-dummies/containers-for-dummies.typ out/containers-for-dummies.pdf
+
 out/what-i-did-this-summer.pdf: what-i-did-this-summer/what-i-did-this-summer-2026.typ
 	typst compile what-i-did-this-summer/what-i-did-this-summer-2026.typ out/what-i-did-this-summer-2026.pdf
 
