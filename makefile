@@ -1,3 +1,7 @@
+p-and-p-plug: plug-and-play/plug.typ
+	typst compile plug-and-play/plug.typ out/plug-and-play-plug.pdf
+
+
 out/containers-for-dummies.pdf: containers-for-dummies/containers-for-dummies.typ
 	typst compile containers-for-dummies/containers-for-dummies.typ out/containers-for-dummies.pdf
 
